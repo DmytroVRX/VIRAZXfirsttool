@@ -3,6 +3,31 @@ import 'package:flutter/material.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+class AppColors {
+  static const Color primary = Color(0xFFFFB6C1);
+  static const Color background = Color(0xFF1E1E1E);
+  static const Color surface = Color(0xFF2B2B2B);
+  static const Color surfaceLight = Color(0xFF252526);
+  static const Color border = Color(0xFF3D3D3D);
+  static const Color text = Color(0xFFE0E0E0);
+  static const Color textSecondary = Color(0xFF9E9E9E);
+  static const Color textMuted = Color(0xFF757575);
+  static const Color closeButton = Color(0xFFE74C3C);
+  static const Color closeButtonPressed = Color(0xFFC0392B);
+}
+
+class AppSizes {
+  static const double windowBorder = 1;
+  static const double small = 4;
+  static const double medium = 8;
+  static const double large = 12;
+  static const double xlarge = 16;
+  static const double xxlarge = 24;
+  static const double logo = 28;
+  static const double borderRadius = 8;
+  static const double cardBorderRadius = 10;
+}
+
 class Note {
   final String title;
   final String text;
@@ -68,19 +93,16 @@ class _HomePageState extends State<HomePage> {
     try {
       final prefs = await SharedPreferences.getInstance();
       final savedNotesJson = prefs.getString('notes_list');
+      final savedText = prefs.getString('current_text');
 
       List<Note> loadedNotes = [];
-      if (savedNotesJson != null && savedNotesJson.isNotEmpty) {
-        final List<dynamic> decoded = jsonDecode(savedNotesJson);
-        loadedNotes = decoded
+      if (savedNotesJson?.isNotEmpty == true) {
+        loadedNotes = (jsonDecode(savedNotesJson!) as List)
             .map((json) => Note.fromJson(json as Map<String, dynamic>))
             .toList();
       }
 
-      final savedText = prefs.getString('current_text');
-      if (savedText != null) {
-        _textController.text = savedText;
-      }
+      if (savedText != null) _textController.text = savedText;
 
       if (mounted) {
         setState(() {
@@ -91,9 +113,7 @@ class _HomePageState extends State<HomePage> {
     } catch (e) {
       if (mounted) {
         _showSnackBar('Load error: $e');
-        setState(() {
-          _isLoading = false;
-        });
+        setState(() => _isLoading = false);
       }
     }
   }
@@ -125,7 +145,7 @@ class _HomePageState extends State<HomePage> {
     _scaffoldKey.currentState?.showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: const Color(0xFF2B2B2B),
+        backgroundColor: AppColors.surface,
         duration: const Duration(seconds: 2),
       ),
     );
@@ -138,23 +158,23 @@ class _HomePageState extends State<HomePage> {
     return showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF2B2B2B),
+        backgroundColor: AppColors.surface,
         title: const Text(
           'Name your note',
-          style: TextStyle(color: Color(0xFFE0E0E0)),
+          style: TextStyle(color: AppColors.text),
         ),
         content: TextField(
           controller: _titleController,
           autofocus: true,
-          style: const TextStyle(color: Color(0xFFE0E0E0)),
+          style: const TextStyle(color: AppColors.text),
           decoration: const InputDecoration(
             hintText: 'Enter name...',
-            hintStyle: TextStyle(color: Color(0xFF9E9E9E)),
+            hintStyle: TextStyle(color: AppColors.textSecondary),
             focusedBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: Color(0xFFFFB6C1)),
+              borderSide: BorderSide(color: AppColors.primary),
             ),
             enabledBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: Color(0xFF555555)),
+              borderSide: BorderSide(color: AppColors.border),
             ),
           ),
         ),
@@ -163,19 +183,15 @@ class _HomePageState extends State<HomePage> {
             onPressed: () => Navigator.pop(context),
             child: const Text(
               'Cancel',
-              style: TextStyle(color: Color(0xFF9E9E9E)),
+              style: TextStyle(color: AppColors.textSecondary),
             ),
           ),
           TextButton(
             onPressed: () async {
               final title = _titleController.text.trim();
               if (title.isNotEmpty) {
-                setState(() {
-                  _notes.add(Note(
-                    title: title,
-                    text: _textController.text,
-                  ));
-                });
+                setState(() =>
+                    _notes.add(Note(title: title, text: _textController.text)));
                 await _saveNotes();
                 if (mounted) {
                   Navigator.pop(context);
@@ -185,7 +201,7 @@ class _HomePageState extends State<HomePage> {
             },
             child: const Text(
               'Save',
-              style: TextStyle(color: Color(0xFFFFB6C1)),
+              style: TextStyle(color: AppColors.primary),
             ),
           ),
         ],
@@ -214,26 +230,26 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       key: _scaffoldKey,
       body: WindowBorder(
-        color: const Color(0xFFFFB6C1),
-        width: 1,
+        color: AppColors.primary,
+        width: AppSizes.windowBorder,
         child: Column(
           children: [
             WindowTitleBarBox(
               child: Container(
-                color: const Color(0xFF1E1E1E),
+                color: AppColors.background,
                 child: Row(
                   children: [
                     Expanded(
                       child: MoveWindow(
                         child: Padding(
-                          padding: const EdgeInsets.only(left: 16),
+                          padding: const EdgeInsets.only(left: AppSizes.xlarge),
                           child: Align(
                             alignment: Alignment.centerLeft,
                             child: Row(
                               children: [
                                 SizedBox(
-                                  width: 28,
-                                  height: 28,
+                                  width: AppSizes.logo,
+                                  height: AppSizes.logo,
                                   child: Image.asset(
                                     'assets/images/logo.png',
                                     fit: BoxFit.contain,
@@ -243,7 +259,7 @@ class _HomePageState extends State<HomePage> {
                                 const Text(
                                   'Virazx Quick Note',
                                   style: TextStyle(
-                                    color: Color(0xFFFFB6C1),
+                                    color: AppColors.primary,
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -262,32 +278,33 @@ class _HomePageState extends State<HomePage> {
             Expanded(
               child: _isLoading
                   ? const Center(
-                      child: CircularProgressIndicator(
-                        color: Color(0xFFFFB6C1),
-                      ),
+                      child:
+                          CircularProgressIndicator(color: AppColors.primary),
                     )
                   : Row(
                       children: [
                         Expanded(
                           flex: 3,
                           child: Container(
-                            color: const Color(0xFF2B2B2B),
+                            color: AppColors.surface,
                             child: Column(
                               children: [
                                 Align(
                                   alignment: Alignment.topRight,
                                   child: Padding(
-                                    padding: const EdgeInsets.all(12),
+                                    padding:
+                                        const EdgeInsets.all(AppSizes.large),
                                     child: Container(
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFF3D3D3D),
-                                        borderRadius: BorderRadius.circular(8),
+                                        color: AppColors.border,
+                                        borderRadius: BorderRadius.circular(
+                                            AppSizes.borderRadius),
                                       ),
                                       child: IconButton(
                                         onPressed: _showSaveDialog,
                                         icon: const Icon(Icons.arrow_downward,
                                             size: 20),
-                                        color: const Color(0xFFFFB6C1),
+                                        color: AppColors.primary,
                                         tooltip: 'Save note',
                                         splashRadius: 20,
                                       ),
@@ -297,7 +314,8 @@ class _HomePageState extends State<HomePage> {
                                 Expanded(
                                   child: Padding(
                                     padding: const EdgeInsets.symmetric(
-                                        horizontal: 24, vertical: 8),
+                                        horizontal: AppSizes.xxlarge,
+                                        vertical: AppSizes.medium),
                                     child: TextField(
                                       controller: _textController,
                                       expands: true,
@@ -305,14 +323,13 @@ class _HomePageState extends State<HomePage> {
                                       minLines: null,
                                       style: const TextStyle(
                                         fontSize: 16,
-                                        color: Color(0xFFE0E0E0),
+                                        color: AppColors.text,
                                         height: 1.6,
                                       ),
                                       decoration: const InputDecoration(
                                         hintText: 'Type something...',
                                         hintStyle: TextStyle(
-                                          color: Color(0xFF757575),
-                                        ),
+                                            color: AppColors.textMuted),
                                         border: InputBorder.none,
                                         focusedBorder: InputBorder.none,
                                         enabledBorder: InputBorder.none,
@@ -326,14 +343,13 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                         Container(
-                          width: 1,
-                          color: const Color(0xFF3D3D3D),
-                        ),
+                            width: AppSizes.windowBorder,
+                            color: AppColors.border),
                         Expanded(
                           flex: 1,
                           child: Container(
-                            color: const Color(0xFF252526),
-                            padding: const EdgeInsets.all(16),
+                            color: AppColors.surfaceLight,
+                            padding: const EdgeInsets.all(AppSizes.xlarge),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -344,22 +360,23 @@ class _HomePageState extends State<HomePage> {
                                     const Text(
                                       'Saved',
                                       style: TextStyle(
-                                        color: Color(0xFFFFB6C1),
+                                        color: AppColors.primary,
                                         fontSize: 14,
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
                                     Container(
                                       padding: const EdgeInsets.symmetric(
-                                          horizontal: 8, vertical: 2),
+                                          horizontal: AppSizes.medium,
+                                          vertical: 2),
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFF3D3D3D),
+                                        color: AppColors.border,
                                         borderRadius: BorderRadius.circular(12),
                                       ),
                                       child: Text(
                                         '${_notes.length}',
                                         style: const TextStyle(
-                                          color: Color(0xFFFFB6C1),
+                                          color: AppColors.primary,
                                           fontSize: 12,
                                           fontWeight: FontWeight.w600,
                                         ),
@@ -367,31 +384,30 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                   ],
                                 ),
-                                const SizedBox(height: 12),
+                                const SizedBox(height: AppSizes.large),
                                 Expanded(
                                   child: _notes.isEmpty
                                       ? const Center(
                                           child: Text(
                                             'No notes yet',
                                             style: TextStyle(
-                                              color: Color(0xFF757575),
+                                              color: AppColors.textMuted,
                                               fontSize: 14,
                                             ),
                                           ),
                                         )
                                       : ListView.separated(
                                           itemCount: _notes.length,
-                                          separatorBuilder: (context, index) =>
-                                              const SizedBox(height: 8),
-                                          itemBuilder: (context, index) {
-                                            final note = _notes[index];
-                                            return _NoteCard(
-                                              note: note,
-                                              onTap: () => _loadNote(note),
-                                              onDelete: () =>
-                                                  _deleteNote(index),
-                                            );
-                                          },
+                                          separatorBuilder: (_, __) =>
+                                              const SizedBox(
+                                                  height: AppSizes.medium),
+                                          itemBuilder: (context, index) =>
+                                              _NoteCard(
+                                            note: _notes[index],
+                                            onTap: () =>
+                                                _loadNote(_notes[index]),
+                                            onDelete: () => _deleteNote(index),
+                                          ),
                                         ),
                                 ),
                               ],
@@ -430,8 +446,8 @@ class _NoteCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF2B2B2B),
-        borderRadius: BorderRadius.circular(10),
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppSizes.cardBorderRadius),
         boxShadow: [
           BoxShadow(
             color: const Color(0xFF000000).withOpacity(0.3),
@@ -444,16 +460,17 @@ class _NoteCard extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(AppSizes.cardBorderRadius),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+            padding: const EdgeInsets.symmetric(
+                horizontal: AppSizes.large, vertical: 14),
             child: Row(
               children: [
                 Expanded(
                   child: Text(
                     note.title,
                     style: const TextStyle(
-                      color: Color(0xFFE0E0E0),
+                      color: AppColors.text,
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
                     ),
@@ -461,16 +478,16 @@ class _NoteCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                const SizedBox(width: 4),
+                const SizedBox(width: AppSizes.small),
                 InkWell(
                   onTap: onDelete,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppSizes.borderRadius),
                   child: const Padding(
                     padding: EdgeInsets.all(4),
                     child: Icon(
                       Icons.delete_outline,
                       size: 18,
-                      color: Color(0xFF757575),
+                      color: AppColors.textMuted,
                     ),
                   ),
                 ),
@@ -488,31 +505,23 @@ class WindowButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final defaultColors = WindowButtonColors(
+      iconNormal: AppColors.primary,
+      mouseOver: AppColors.border,
+      mouseDown: const Color(0xFF555555),
+      iconMouseOver: AppColors.primary,
+      iconMouseDown: AppColors.primary,
+    );
+
     return Row(
       children: [
-        MinimizeWindowButton(
-          colors: WindowButtonColors(
-            iconNormal: const Color(0xFFFFB6C1),
-            mouseOver: const Color(0xFF3D3D3D),
-            mouseDown: const Color(0xFF555555),
-            iconMouseOver: const Color(0xFFFFB6C1),
-            iconMouseDown: const Color(0xFFFFB6C1),
-          ),
-        ),
-        MaximizeWindowButton(
-          colors: WindowButtonColors(
-            iconNormal: const Color(0xFFFFB6C1),
-            mouseOver: const Color(0xFF3D3D3D),
-            mouseDown: const Color(0xFF555555),
-            iconMouseOver: const Color(0xFFFFB6C1),
-            iconMouseDown: const Color(0xFFFFB6C1),
-          ),
-        ),
+        MinimizeWindowButton(colors: defaultColors),
+        MaximizeWindowButton(colors: defaultColors),
         CloseWindowButton(
           colors: WindowButtonColors(
-            iconNormal: const Color(0xFFFFB6C1),
-            mouseOver: const Color(0xFFE74C3C),
-            mouseDown: const Color(0xFFC0392B),
+            iconNormal: AppColors.primary,
+            mouseOver: AppColors.closeButton,
+            mouseDown: AppColors.closeButtonPressed,
             iconMouseOver: Colors.white,
             iconMouseDown: Colors.white,
           ),
