@@ -327,7 +327,7 @@ class _HomePageState extends State<HomePage> {
                                         height: 1.6,
                                       ),
                                       decoration: const InputDecoration(
-                                        hintText: 'Type something...',
+                                        hintText: 'Start typing your notes...',
                                         hintStyle: TextStyle(
                                             color: AppColors.textMuted),
                                         border: InputBorder.none,
