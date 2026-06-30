@@ -62,7 +62,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Virazx Quick Note',
+      title: 'Virazx Quick Notes',
       home: const HomePage(),
     );
   }
